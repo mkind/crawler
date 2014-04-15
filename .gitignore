@@ -1,0 +1,16 @@
+# java
+*.class
+
+# python
+*.pyc
+
+# no vim swap files
+*.swp
+
+# no tex generated file
+*.aux
+*.bbl
+*.log
+*.out
+*.blg 
+

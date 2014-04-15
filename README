@@ -1,0 +1,96 @@
+sascha zinke
+maximilian haeckel
+
+starting the crawler:
+
+% cd crawler/
+ % jython27 crawler.py http://www.udacity.com/cs101x/index.html -i
+ MainThread [INFO]: creating new Crawler..
+ MainThread [INFO]: starting crawling..
+ Thread-1 [INFO]: target(0): http://udacity.com/cs101x/index.html
+ Thread-1 [INFO]: target(1): http://udacity.com/cs101x/crawling.html
+ Thread-2 [INFO]: target(1): http://udacity.com/cs101x/flying.html
+ Thread-3 [INFO]: target(1): http://udacity.com/cs101x/walking.html
+ Thread-1 [INFO]: target(2): http://udacity.com/cs101x/kicking.html
+ http://udacity.com/cs101x/crawling.html
+ http://udacity.com/cs101x/index.html
+ http://udacity.com/cs101x/walking.html
+ http://udacity.com/cs101x/kicking.html
+ http://udacity.com/cs101x/flying.html
+ finished in 1.618000s
+ > kick
+    -> (1.405591) http://udacity.com/cs101x/kicking.html
+        u'<html>\n<body>\n<b>Kick! Kick! Kick!</b>\n</body>\n</html>\n'
+    -> (1.405591) http://udacity.com/cs101x/kicking.html'
+        u'<html>\n<body>\n<b>Kick! Kick! Kick!</b>\n</body>\n</html>\n'
+    ...
+
+Note:
+Check output for import warnings. The indexer only works, if the import
+succeeded!
+
+The crawling algorithm mainly consists of the following steps:
+
+
+          provide initial target
+                  |
+      ----------- |
+     /            \
+    |             |
+    |             v
+    |     __________________
+    |    |                  | The crawler provides an internal target queue
+    |    | fill target queue| which contains the url it has not visited yet.
+    |    |__________________|
+    |             |
+    |             | get a target from queue
+    |             | drop if invalid media type
+    |             v
+    |     __________________
+    |    |                  |
+    |    | request website  | get requested target website
+    |    |__________________|
+    |             |
+    |             |
+    |             v
+    |     __________________
+    |    |                  | extract interesting information
+    |    |  extract inform. | (links, metadata, mail addresses)
+    |    |__________________|
+    |           /   \
+     \         /     \
+      ---------      |
+   fill in target    v
+  if not in result__________________
+                 |                  | information are stored
+                 | fill result queue| in a result queue
+                 |__________________|
+
+
+
+The crawler provides an interactive mode('-i'). If used, the crawler takes
+input to build indexer queries. The result is written to stdout. Also you can
+set the crawling depth ('--depth') and the amount of threads crawling
+('--threads').
+
+Indexing:
+
+    This setup uses the apache lucene indexer in java. To get it working, you 
+    need to run the crawler with jython - otherwise the import of the indexer 
+    will. This has no effect on the crawling itself.
+
+Some implementation details:
+
+    To provide a queue that only puts elements once, the Queue.Queue's hooks 
+    for _init, _put, _get are overwritten to use the internal data type 
+    sets(). This is quit cool, since it does not affect the multithreading 
+    functionality of Queue.Queue and garantuees, that no element ist put a
+    second time. (UniqueQueue, scn.py)
+
+    To get a website's content, the extractor class inherits from HTMLParser
+    python class and provides methods  to everything of a website that 
+    might contain interesting information. If the HTMLParser comes to a
+    beginning tag, it will call the Extractor's handle_starttag. 
+
+
+
